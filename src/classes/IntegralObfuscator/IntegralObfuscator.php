@@ -51,6 +51,11 @@ final class IntegralObfuscator
 	private $hash;
 
 	/**
+	 * @var mixed
+	 */
+	private $ast;
+
+	/**
 	 * @param string $inputFile
 	 * @param string $outputFile
 	 * @throws \Exception
@@ -97,30 +102,31 @@ final class IntegralObfuscator
 	 */
 	public function execute(): void
 	{
-		$this->initParser();
+		$this->runVisitor();
+		print $this->ast;
 	}
 
 	/**
 	 * @throws \Exception
 	 * @return void
 	 */
-	private function initParser(): void
+	private function runVisitor(): void
 	{
 		$parser = (new ParserFactory)->create(ParserFactory::PREFER_PHP7);
 		try {
-		    $ast = $parser->parse($this->inputContent);
+		    $this->ast = $parser->parse($this->inputContent);
 		} catch (Error $error) {
 		    throw new Exception("Parse error: {$error->getMessage()}");
 		}
 
 		$traverser = new NodeTraverser;
 		$traverser->addVisitor(new IntegralVisitor($this));
-		$ast = $traverser->traverse($ast);
+		$this->ast = $traverser->traverse($this->ast);
 		$prettyPrinter = new PrettyPrinter\Standard;
-		file_put_contents(TMP_DIR."/integralobf_{$this->hash}.tmp", $prettyPrinter->prettyPrintFile($ast));
-		$ast = shell_exec(PHP_BINARY." -w ".escapeshellarg(TMP_DIR."/integralobf_{$this->hash}.tmp"));
+		file_put_contents(TMP_DIR."/integralobf_{$this->hash}.tmp", $prettyPrinter->prettyPrintFile($this->ast));
+		$this->ast = shell_exec(PHP_BINARY." -w ".escapeshellarg(TMP_DIR."/integralobf_{$this->hash}.tmp"));
 		unlink(TMP_DIR."/integralobf_{$this->hash}.tmp");
-		print $ast;
+		unset($parser, $traverser, $prettyPrinter);
 	}
 
 	/**

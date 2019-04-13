@@ -3,8 +3,8 @@
 namespace IntegralObfuscator;
 
 use PhpParser\Node;
-use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Expr\Variable;
+use PhpParser\Node\Scalar\String_;
 use PhpParser\NodeVisitorAbstract;
 
 /**
@@ -39,7 +39,10 @@ class IntegralVisitor extends NodeVisitorAbstract
 	public function enterNode(Node $node) {
         if ($node instanceof Variable) {
         	if (!isset($this->varHash[$node->name])) {
-        		$this->varHash[$node->name] = $this->m->gen(64, 3, range(chr(128), chr(255)));
+        		do {
+        			$varName = $this->m->gen(32, 3, range(chr(128), chr(255)));
+        		} while (array_search($varName, $this->varHash) !== false);
+        		$this->varHash[$node->name] = $varName;
         	}
         	$node->name = $this->varHash[$node->name];
             return;
