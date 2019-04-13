@@ -15,7 +15,7 @@
     },
     "autoload": {
         "psr-4": {
-            "IceTeaObfuscator\\": "src/classes/IceTeaObfuscator/"
+            "IntegralObfuscator\\": "src/classes/IntegralObfuscator/"
         }
     }
 }

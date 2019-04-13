@@ -2,15 +2,10 @@
 
 namespace IntegralObfuscator;
 
-defined("TMP_DIR") or exit("TMP_DIR is not defined!\n");
-
 use Exception;
 use PhpParser\Error;
 use PhpParser\NodeDumper;
 use PhpParser\ParserFactory;
-use PhpParser\PrettyPrinter;
-use PhpParser\Node\Expr\Variable;
-use PhpParser\Node\Scalar\EncapsedStringPart;
 
 /**
  * @author Ammar Faizi <ammarfaizi2@gmail.com>
@@ -30,10 +25,20 @@ final class IntegralObfuscator
 	 */
 	private $outputFile;
 
+	/**
+	 * @var resource
+	 */
+	private $outHandle;
+
+	/**
+	 * @var string
+	 */
+	private $inputContent;
 
 	/**
 	 * @param string $inputFile
 	 * @param string $outputFile
+	 * @throws \Exception
 	 *
 	 * Constructor.
 	 */
@@ -41,6 +46,25 @@ final class IntegralObfuscator
 	{
 		$this->inputFile = $inputFile;
 		$this->outputFile = $outputFile;
+
+		if (!file_exists($inputFile)) {
+			throw new Exception("Input file does not exist: {$inputFile}");
+		}
+
+		if (!is_readable($inputFile)) {
+			throw new Exception("Input file is not readable: {$inputFile}");
+		}
+
+		$this->inputContent = file_get_contents($inputFile);
+
+		if (!is_string($this->inputContent)) {
+			throw new Exception("An error occured when opening the input file: {$inputFile}");
+		}
+
+		$this->outHandle = fopen($outputFile, "w");
+		if (!is_resource($this->outHandle)) {
+			throw new Exception("Cannot open output file: {$outputFile}");
+		}
 	}
 
 	/**
@@ -48,6 +72,49 @@ final class IntegralObfuscator
 	 */
 	public function execute(): void
 	{
-		
+		$this->initParser();
+	}
+
+	/**
+	 * @throws \Exception
+	 * @return void
+	 */
+	private function initParser(): void
+	{
+		$parser = (new ParserFactory)->create(ParserFactory::PREFER_PHP7);
+		try {
+		    $ast = $parser->parse($code);
+		} catch (Error $error) {
+		    throw new Exception("Parse error: {$error->getMessage()}");
+		}
+		var_dump($ast);
+	}
+
+	/**
+	 * @return void
+	 */
+	private function skeletonBuild(): void
+	{
+
+	}
+
+	/**
+	 * @param string $str
+	 * @param string $key
+	 * @return string
+	 */
+	private function decrypt(string $str, string $key): string
+	{
+
+	}
+
+	/**
+	 * @param string $str
+	 * @param string $key
+	 * @return string
+	 */
+	private function encrypt(string $str, string $key): string
+	{
+
 	}
 }

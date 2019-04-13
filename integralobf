@@ -3,5 +3,7 @@
 
 require __DIR__."/src/autoload.php";
 
+use IntegralObfuscator\IntegralObfuscator;
+
 $st = new IntegralObfuscator("input.php", "output.php");
 $st->execute();
