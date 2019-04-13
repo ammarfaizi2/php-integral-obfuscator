@@ -40,7 +40,11 @@ class IntegralVisitor extends NodeVisitorAbstract
         if ($node instanceof Variable) {
         	if (!isset($this->varHash[$node->name])) {
         		do {
-        			$varName = $this->m->gen(64, 3, range(chr(128), chr(255)));
+        			$varName = "";
+        			for ($i=0; $i < 7; $i++) { 
+        				$varName .= str_repeat($this->m->gen(1, 3, range(chr(128), chr(255))), 8);		
+        			}
+        			$varName = $this->m->gen(8, 3, range(chr(128), chr(255)));
         		} while (array_search($varName, $this->varHash) !== false);
         		$this->varHash[$node->name] = $varName;
         	}

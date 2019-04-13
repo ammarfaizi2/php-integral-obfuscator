@@ -6,4 +6,6 @@ require __DIR__."/src/autoload.php";
 use IntegralObfuscator\IntegralObfuscator;
 define("TMP_DIR", "/tmp");
 $st = new IntegralObfuscator("input.php", "output.php");
+$st->setShebang("/usr/bin/env php");
+$st->setKey("password123");
 $st->execute();

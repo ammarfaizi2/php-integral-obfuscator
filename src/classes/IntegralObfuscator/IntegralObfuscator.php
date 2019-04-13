@@ -43,7 +43,7 @@ final class IntegralObfuscator
 	/**
 	 * @var string
 	 */
-	private $sheBang;
+	private $sheBang = null;
 
 	/**
 	 * @var string
@@ -54,6 +54,11 @@ final class IntegralObfuscator
 	 * @var mixed
 	 */
 	private $ast;
+
+	/**
+	 * @var string
+	 */
+	private $key = "abc123";
 
 	/**
 	 * @param string $inputFile
@@ -98,12 +103,33 @@ final class IntegralObfuscator
 	}
 
 	/**
+	 * @param string $key
+	 * @return void
+	 */
+	public function setKey(string $key): void
+	{
+		$this->key = $key;
+	}
+
+	/**
 	 * @return void
 	 */
 	public function execute(): void
 	{
 		$this->runVisitor();
-		print $this->ast;
+		$this->runEncryptor();
+		if (is_string($this->sheBang)) {
+			fwrite($this->outHandle, "#!{$this->sheBang}\n");
+		}
+		fwrite($this->outHandle, $this->ast);
+	}
+
+	/**
+	 * @return void
+	 */
+	private function runEncryptor()
+	{
+		$this->ast = $this->encrypt(gzdeflate($this->ast, 9), $this->key, false);
 	}
 
 	/**
@@ -113,6 +139,7 @@ final class IntegralObfuscator
 	private function runVisitor(): void
 	{
 		$parser = (new ParserFactory)->create(ParserFactory::PREFER_PHP7);
+
 		try {
 		    $this->ast = $parser->parse($this->inputContent);
 		} catch (Error $error) {
@@ -167,6 +194,19 @@ final class IntegralObfuscator
 
 	/**
 	 * @param string $str
+	 * @return string
+	 */
+	public function escape(string $str): string
+	{
+		return str_replace(
+			["\\", "\"", "\$"],
+			["\\\\", "\\\"", "\\\$"],
+			$str
+		);
+	}
+
+	/**
+	 * @param string $str
 	 * @param string $key
 	 * @return string
 	 */
@@ -176,12 +216,59 @@ final class IntegralObfuscator
 	}
 
 	/**
-	 * @param string $str
+	 * @param string $string
 	 * @param string $key
+	 * @param bool	 $binarySafe
 	 * @return string
 	 */
-	private function encrypt(string $str, string $key): string
+	private function encrypt(string $string, string $key, bool $binarySafe = true): string
 	{
+		$slen = strlen($string);
+		$klen = strlen($key);
+		$r = $newKey = "";
+		$salt = self::saltGenerator();
+		$cost = 1;
+		for($i=$j=0;$i<$klen;$i++) {
+			$newKey .= chr(ord($key[$i]) ^ ord($salt[$j++]));
+			if ($j === 5) {
+				$j = 0;
+			}
+		}
+		$newKey = sha1($newKey);
+		for($i=$j=$k=0;$i<$slen;$i++) {		
+			$r .= chr(
+				ord($string[$i]) ^ ord($newKey[$j++]) ^ ord($salt[$k++]) ^ ($i << $j) ^ ($k >> $j) ^
+				($slen % $cost) ^ ($cost >> $j) ^ ($cost >> $i) ^ ($cost >> $k) ^
+				($cost ^ ($slen % ($i + $j + $k + 1))) ^ (($cost << $i) % 2) ^ (($cost << $j) % 2) ^ 
+				(($cost << $k) % 2) ^ (($cost * ($i+$j+$k)) % 3)
+			);
+			$cost++;
+			if ($j === $klen) {
+				$j = 0;
+			}
+			if ($k === 5) {
+				$k = 0;
+			}
+		}
+		$r .= $salt;
+		if ($binarySafe) {
+			return strrev(base64_encode($r));
+		} else {
+			return $r;
+		}
+	}
 
+	/**
+	 * @param int $n
+	 * @return string
+	 */
+	private static function saltGenerator($n = 5)
+	{
+		$s = range(chr(0), chr(0xff));
+		$r = ""; $c=count($s)-1;
+		for($i=0;$i<$n;$i++) {
+			$r.= $s[rand(0, $c)];
+		}
+		return $r;
 	}
 }
