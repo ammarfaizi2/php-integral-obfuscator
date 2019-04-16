@@ -37,4 +37,6 @@ if (
 			"http".(isset($_SERVER["HTTPS"])?"s":"")."://".$_SERVER["HTTP_HOST"]."/obfuscated/{$hash}.phx"
 		);
 	}
+} else {
+	header("Location: /");
 }
