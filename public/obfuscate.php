@@ -30,7 +30,7 @@ if (
 	$inputFile = escapeshellarg(realpath(__DIR__."/../storage/raw/")."/{$hash}.tmp");
 	$commands = [
 		"mv -vf ".escapeshellarg($_FILES["file"]["tmp_name"])." {$inputFile}",
-"../integralobf \\
+"/usr/bin/php ../integralobf \\
 	-o ".escapeshellarg($outputFile = realpath(__DIR__."/../storage/obfuscated")."/{$hash}.phx")." \\
 	-k ".escapeshellarg($_POST["key"])." \\\n	".($_POST["shebang"]!==""?"-s ".escapeshellarg($_POST["shebang"])." \\":"")."
 	{$inputFile}"
