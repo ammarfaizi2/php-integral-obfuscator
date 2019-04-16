@@ -37,7 +37,9 @@ if (
 	];
 	foreach ($commands as $k => $cmd) {
 		printf("- %s\n", $cmd);
+		flush();
 		print shell_exec($cmd." 2>&1")."\n";
+		flush();
 	}
 
 	if (file_exists($outputFile)) {
