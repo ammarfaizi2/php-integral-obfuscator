@@ -3,6 +3,8 @@
 namespace IntegralObfuscator;
 
 use PhpParser\Node;
+use PhpParser\NodeTraverser;
+use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Scalar\String_;
 use PhpParser\NodeVisitorAbstract;
@@ -50,6 +52,8 @@ class IntegralVisitor extends NodeVisitorAbstract
         	}
         	$node->name = $this->varHash[$node->name];
             return;
+        } else if ($node instanceof Class_) {
+        	return NodeTraverser::STOP_TRAVERSAL;
         }
     }
 }

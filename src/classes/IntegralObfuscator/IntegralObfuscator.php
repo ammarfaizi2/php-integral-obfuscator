@@ -152,6 +152,7 @@ final class IntegralObfuscator
 		$this->buildInternalFunc();
 		$this->buildIntegralInit();
 		$this->buildApp();
+		$this->buildFooter();
 	}
 
 	/**
@@ -172,7 +173,7 @@ final class IntegralObfuscator
  * std::hd::".sha1($this->key)."
  *
  * handled = SIGINT, SIGTERM, SIGCHLD
- */
+ */// \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\1\1\0\0\0\0\0\0\0\0\0\0\0\0
 
 #include <php/integral/obf.h>
 #include <php/integral/protector.h>
@@ -239,27 +240,22 @@ if (function_exists(\"pcntl_signal\")) {
 			"{$this->escape($this->encrypt(gzdeflate(self::$intStop."?>".$this->ast, 9), $this->md5Key))}".
 			"\", {$this->fx["gzinflate"]}(\"{$this->escape(gzdeflate($this->md5Key))}\"))));";
 
-		$app = 
-			"eval({$this->fx["gzinflate"]}((\"{$this->escape($this->decryptorName)}\")(\"".
-			"{$this->escape($this->encrypt(gzdeflate(self::$intStop.$app.self::$intStop, 9), $this->md5Key))}".
-			"\", {$this->fx["gzinflate"]}(\"{$this->escape(gzdeflate($this->md5Key))}\"))));";
-
-		$app = 
-			"eval({$this->fx["gzinflate"]}((\"{$this->escape($this->decryptorName)}\")(\"".
-			"{$this->escape($this->encrypt(gzdeflate(self::$intStop.$app.self::$intStop, 9), $this->md5Key))}".
-			"\", {$this->fx["gzinflate"]}(\"{$this->escape(gzdeflate($this->md5Key))}\"))));";
-
-		$app = 
-			"eval({$this->fx["gzinflate"]}((\"{$this->escape($this->decryptorName)}\")(\"".
-			"{$this->escape($this->encrypt(gzdeflate(self::$intStop.$app.self::$intStop, 9), $this->md5Key))}".
-			"\", {$this->fx["gzinflate"]}(\"{$this->escape(gzdeflate($this->md5Key))}\"))));";
-
-		$app = 
-			"eval({$this->fx["gzinflate"]}((\"{$this->escape($this->decryptorName)}\")(\"".
-			"{$this->escape($this->encrypt(gzdeflate(self::$intStop.$app.self::$intStop, 9), $this->md5Key))}".
-			"\", {$this->fx["gzinflate"]}(\"{$this->escape(gzdeflate($this->md5Key))}\"))));";
+		for ($i=0; $i < 4; $i++) { 
+			$app = 
+				"eval({$this->fx["gzinflate"]}((\"{$this->escape($this->decryptorName)}\")(\"".
+				"{$this->escape($this->encrypt(gzdeflate(self::$intStop.$app.self::$intStop, 9), $this->md5Key))}".
+				"\", {$this->fx["gzinflate"]}(\"{$this->escape(gzdeflate($this->md5Key))}\"))));";
+		}
 
 		fwrite($this->outHandle, $app);
+	}
+
+	/**
+	 * @return void
+	 */
+	private function buildFooter(): void
+	{
+		
 	}
 
 	/**
