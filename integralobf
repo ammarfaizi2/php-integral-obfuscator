@@ -4,8 +4,151 @@
 require __DIR__."/src/autoload.php";
 
 use IntegralObfuscator\IntegralObfuscator;
+
+array_shift($_SERVER["argv"]);
+
+$tmpDir = "/tmp";
+$outputFile = "a.out";
+$inputFile = null;
+$sheBang = null;
+$key = "abc123";
+
+$hasInputFile = $cq = $skip = false;
+foreach ($_SERVER["argv"] as $k => $v) {
+
+	if ($skip) {
+		$skip = false;
+		continue;
+	}
+
+	if ($v[0] === '-') {
+		$l = strlen($v);
+		if ($l === 2) {
+			if ($v[1] === "-") {
+				goto invalid_parameter;
+			} else {
+				parseOpt1();
+			}
+		} else if ($v[1] === "-") {
+			parseOpt2();
+		} else {
+			$cq = true;
+			parseOpt1();
+		}
+	} else {
+		if ($hasInputFile) {
+			goto double_input_file;
+			exit(1);
+		}
+		$inputFile = $v;
+		$hasInputFile = true;
+	}
+}
+
+if (!is_string($inputFile)) {
+	goto input_file_required;
+}
+
 define("TMP_DIR", "/tmp");
-$st = new IntegralObfuscator("input.php", "output.php");
-$st->setShebang("/usr/bin/env php");
-$st->setKey("password123");
-$st->execute();
+try {
+
+	if ($key === "") {
+		printf("Error: Key cannot be empty!\n");
+		exit(1);
+	}
+	$inputFile = realpath($oldInputFile = $inputFile);
+	if ((!$inputFile)) {
+		$inputFile = $oldInputFile;
+	}
+	unset($oldInputFile);
+
+	printf("Initializing obfuscator...\n");
+	printf("===============================================\n");
+	printf("Input file\t: %s\n", $inputFile);
+	$st = new IntegralObfuscator($inputFile, $outputFile);
+	printf("Output file\t: %s\n", $outputFile = realpath($outputFile));
+	printf("File Key\t: %s\n", $key);
+	if (is_string($sheBang)) {
+		$st->setShebang($sheBang);
+		printf("Shebang\t\t: %s\n", $sheBang);
+	} else {
+		printf("Shebang\t\t: %s\n", "(no shebang)");
+	}
+	printf("===============================================\n");
+	$st->setKey($key);
+	$st->execute();
+	printf("Obfuscation finished!\n");
+	printf("md5sum\t: %s (%s)\n", $outputFile, md5_file($outputFile));
+	printf("sha1sum\t: %s (%s)\n", $outputFile, sha1_file($outputFile));
+} catch (Exception $e) {
+	printf("\n\nAn error occured: %s\n", $e->getMessage());
+	exit(1);
+}
+
+exit(0);
+
+
+function parseOpt1(): void
+{
+	global $k, $v, $cq, $skip, $tmpDir, $inputFile, $outputFile;
+
+	if ($v === "-o") {
+		if ($cq) {
+			$outputFile = substr($v, 2);
+			$cq = false;
+			return;
+		} else if (!isset($_SERVER["argv"][$k + 1])) {
+			printf("Error: -o option required a value\n");
+			exit(1);
+		} else {
+			$outputFile = $_SERVER["argv"][$k + 1];
+			$skip = true;
+			return;
+		}
+	}
+
+	if ($v === "-s") {
+		if ($cq) {
+			$sheBang = substr($v, 2);
+			$cq = false;
+			return;
+		} else if (!isset($_SERVER["argv"][$k + 1])) {
+			printf("Error: -s option required a value\n");
+			exit(1);
+		} else {
+			$sheBang = $_SERVER["argv"][$k + 1];
+			$skip = true;
+			return;
+		}
+	}
+
+	if ($v === "-k") {
+		if ($cq) {
+			$key = substr($v, 2);
+			$cq = false;
+			return;
+		} else if (!isset($_SERVER["argv"][$k + 1])) {
+			printf("Error: -k option required a value\n");
+			exit(1);
+		} else {
+			$key = $_SERVER["argv"][$k + 1];
+			$skip = true;
+			return;
+		}		
+	}
+}
+
+
+// Errors
+
+invalid_parameter:
+	printf("Error: Invalid parameter \"%s\"\n", $v);
+	exit(1);
+
+input_file_required:
+	printf("Error: Input file required!\n");
+	exit(1);
+
+double_input_file:
+	print("Error: Compiling multiple file is not supported!\n");
+	exit(1);
