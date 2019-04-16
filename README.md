@@ -26,9 +26,6 @@ Example usage:
 	./integralobf --output output.php --key mypassword123 --shebang '/usr/bin/env php' input.php
 
 
-Read more:
-	https://github.com/ammarfaizi2/php-integral-obfuscator
-
 ```
 
 # Contribution
