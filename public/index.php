@@ -60,6 +60,9 @@
 				</form>
 			</div>
 		</div>
+		<div style="margin-top:50px;">
+			<a target="_blank" style="color:blue;" href="https://github.com/ammarfaizi2/php-integral-obfuscator">https://github.com/ammarfaizi2/php-integral-obfuscator</a>
+		</div>
 	</center>
 </body>
 </html>

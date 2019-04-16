@@ -12,6 +12,15 @@ if (
 ) {
 	header("Content-Type: text/plain");
 
+	if (!file_exists($_FILES["file"]["tmp_name"])) {
+		printf("Upload file error!\n");
+		exit;
+	}
+
+	if (substr($_POST["shebang"], 0, 2) === "#!") {
+		$_POST["shebang"] = substr($_POST["shebang"], 3);
+	}
+
 	if ($_POST["key"] === "") {
 		printf("Key is empty, fallback to default: abc123\n");
 		$_POST["key"];
