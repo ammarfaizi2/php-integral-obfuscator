@@ -6,3 +6,6 @@
 *.lock
 /vendor/
 /.phpintel/
+/output.php
+/.gdb_history
+/peda-session-*
