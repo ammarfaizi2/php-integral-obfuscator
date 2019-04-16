@@ -5,6 +5,12 @@ require __DIR__."/src/autoload.php";
 
 use IntegralObfuscator\IntegralObfuscator;
 
+$appName = $_SERVER["argv"][0];
+
+if ($argc === 1) {
+	usage();
+}
+
 array_shift($_SERVER["argv"]);
 
 $tmpDir = "/tmp";
@@ -142,6 +148,10 @@ function parseOpt1(): void
 		}
 	}
 
+	if ($v === "-h") {
+		usage();
+	}
+
 	$v = substr($v, 0, 2);
 	$inv = true;
 }
@@ -183,9 +193,32 @@ function parseOpt2(): void
 		}
 	}
 
+	if ($v === "--help") {
+		usage();
+	}
+
 	$inv = true;
 }
 
+function usage(): void
+{
+	global $appName;
+	printf("Usage: %s [option] <file>\n\n", $appName);
+	printf("\t-k <key>\tGive a key to encrypt the input file (default: abc123).\n");
+	printf("\t--key <key>\tGive a key to encrypt the input file (default: abc123).\n");
+	printf("\t-o <file>\tSave obfuscated PHP code to <file> (default: a.out).\n");
+	printf("\t--output <file>\tSave obfuscated PHP code to <file> (default: a.out).\n");
+	printf("\t-s <shebang>\tAdd a shebang into obfuscated PHP file (default: (no shebang)).\n");
+	printf("\t--output <file>\tAdd a shebang into obfuscated PHP file (default: (no shebang)).\n");
+	printf("\t-h\t\tShow this message.\n");
+	printf("\t--help\t\tShow this message.\n");
+	printf("\n\n");
+	printf("Example usage:\n");
+	printf("\t%s --output output.php --key mypassword123 --shebang '/usr/bin/env php' input.php\n", $appName);
+	printf("\n\n");
+	printf("Read more:\n\thttps://github.com/ammarfaizi2/php-integral-obfuscator\n");
+	exit(0);
+}
 
 // Errors
 
