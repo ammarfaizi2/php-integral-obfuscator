@@ -218,13 +218,6 @@ if (function_exists(\"pcntl_signal\")) {
 			"extension_loaded" => $this->gend(3)
 		];
 
-		$this->fx["preg_match"] = "\$preg_match";
-		$this->fx["explode"] = "\$explode";
-		$this->fx["file_get_contents"] = "\$file_get_contents";
-		$this->fx["sleep"] = "\$sleep";
-		$this->fx["rand"] = "\$rand";
-		$this->fx["extension_loaded"] = "\$extension_loaded";
-
 		foreach ($this->fx as $key => $val) {
 			fwrite($this->outHandle, "{$val}=\"{$this->convert($key)}\"/*\ec\0*/AND/*\ec\0*/");
 		}
@@ -262,25 +255,19 @@ if (function_exists(\"pcntl_signal\")) {
 	{
 		fwrite($this->outHandle, " eval(@{$this->fx["gzinflate"]}(\"");
 		$lv = [
-			// "a" => $this->gend(3),
-			// "b" => $this->gend(3),
-			// "c" => $this->gend(3),
-			// "d" => $this->gend(3),
-			"a" => "\$a",
-			"b" => "\$b", 
-			"c" => "\$c",
-			"d" => "\$d"
+			"a" => $this->gend(3),
+			"b" => $this->gend(3),
+			"c" => $this->gend(3),
+			"d" => $this->gend(3),
 		];
 		$this->decryptorName = $this->gen(300, 3, range(chr(128), chr(255)));
 		$ef =
-			"/*\0*/((!{$this->fx["extension_loaded"]}(\"{$this->convert("evalhook")}\"))/*\0*/AND{$this->fx["preg_match"]}(\"{$this->convert("/\/\*.+\*\//Us")}\",{$lv["d"]})/*\0*/AND/*\0*/".
-			"{$this->fx["sha1"]}({$lv["a"]}[0])/*\1\1\0\5\5\5\5\5\5\5\5\0\0*/===/*\0*/\"".$this->convert(sha1("\57\52\x2a\xa\x20\52\x20\104\x4f\x20\x4e\117\124\40\x45\104\x49\x54\40\x54\x48\x49\x53\40\x46\x49\114\x45\40\x42\131\x20\x48\101\x4e\104\41\12\x20\x2a\12\40\52\x20\100\154\x69\x6e\x6b\x20\x68\x74\x74\x70\x73\x3a\57\x2f\x67\151\x74\150\165\142\x2e\x63\x6f\x6d\57\x61\155\x6d\141\162\x66\141\151\x7a\151\x32\x2f\160\150\160\55\151\156\x74\x65\147\162\141\x6c\55\x6f\142\x66\165\163\x63\141\x74\157\162\xa\40\52\40\x40\x63\157\160\x79\162\151\147\x68\164\x20\x68\x74\x74\160\163\72\x2f\57\160\x68\x70\55\x6f\x62\146\165\163\x63\x61\164\157\x72\x2e\164\x65\x61\x69\156\x73\x69\144\x65\x2e\157\x72\x67\12\x20\x2a\40\x40\x6c\151\143\x65\x6e\163\x65\x20\x4d\111\124\xa\x20\x2a\40\100\166\145\162\163\151\x6f\156\x20\x30\56\60\56\61\xa\40\x2a\xa\40\x2a\x20\x73\164\144\x3a\x3a\150\144\72\72".sha1($this->key)."\12\x20\52\xa\40\52\40\150\141\156\144\x6c\145\144\x20\75\x20\x53\x49\x47\111\x4e\x54\54\x20\123\x49\x47\124\x45\x52\115\54\40\123\111\x47\103\x48\x4c\104\xa\x20\x2a\57"))."\"/*\1\1\0\5\5\5\5\5\5\5\5\0\0*//*\1\1\0\5\5\5\5\5\5\5\5\0\0*/AND/*\1\1\0\5\5\5\5\5\5\5\5\0\0*/(function(){{$this->generateDecryptor($this->decryptorName)}return 1;})()) OR ({$this->fx["sleep"]}({$this->fx["rand"]}(0x1,0x8)) XOR exit({$this->fx["gzinflate"]}(\"{$this->escape(gzdeflate("Segmentation Fault\n"))}\")));";
-		$ef = preg_replace("/[^[:print:]]/", "a", $ef);
-		print "<?php $ef";die;
+			"/*\0*/((!{$this->fx["extension_loaded"]}(\"{$this->convert("evalhook")}\"))/*\0*/AND{$this->fx["preg_match"]}(\"{$this->convert("/\/\*.+\*\//Us")}\",{$lv["d"]},{$lv["a"]})/*\0*/AND/*\0*/".
+			"{$this->fx["sha1"]}({$lv["a"]}[0])/*\1\1\0\5\5\5\5\5\5\5\5\0\0*/===/*\0*/\"".$this->convert(sha1("\57\52\x2a\xa\x20\52\x20\104\x4f\x20\x4e\117\124\40\x45\104\x49\x54\40\x54\x48\x49\x53\40\x46\x49\114\x45\40\x42\131\x20\x48\101\x4e\104\41\12\x20\x2a\12\40\52\x20\100\154\x69\x6e\x6b\x20\x68\x74\x74\x70\x73\x3a\57\x2f\x67\151\x74\150\165\142\x2e\x63\x6f\x6d\57\x61\155\x6d\141\162\x66\141\151\x7a\151\x32\x2f\160\150\160\55\151\156\x74\x65\147\162\141\x6c\55\x6f\142\x66\165\163\x63\141\x74\157\162\xa\40\52\40\x40\x63\157\160\x79\162\151\147\x68\164\x20\x68\x74\x74\160\163\72\x2f\57\160\x68\x70\55\x6f\x62\146\165\163\x63\x61\164\157\x72\x2e\164\x65\x61\x69\156\x73\x69\144\x65\x2e\157\x72\x67\12\x20\x2a\40\x40\x6c\151\143\x65\x6e\163\x65\x20\x4d\111\124\xa\x20\x2a\40\100\166\145\162\163\151\x6f\156\x20\x30\56\60\56\61\xa\40\x2a\xa\40\x2a\x20\x73\164\144\x3a\x3a\150\144\72\72".sha1($this->key)."\12\x20\52\xa\40\52\40\150\141\156\144\x6c\145\144\x20\75\x20\x53\x49\x47\111\x4e\x54\54\x20\123\x49\x47\124\x45\x52\115\54\40\123\111\x47\103\x48\x4c\104\xa\x20\x2a\57"))."\"/*\1\1\0\5\5\5\5\5\5\5\5\0\0*//*\1\1\0\5\5\5\5\5\5\5\5\0\0*/AND/*\1\1\0\5\5\5\5\5\5\5\5\0\0*/(function(){{$this->generateDecryptor($this->decryptorName)}return 1;})()) OR ({$this->fx["sleep"]}({$this->fx["rand"]}(0x1,0x8)) XOR exit({$this->fx["gzinflate"]}(\"{$this->escape(gzdeflate("Segmentation Fault\n"))}\")));return 1;";
 		$ef =
 			"(/*\0*/{$lv["d"]}=@{$this->fx["file_get_contents"]}({$this->fx["explode"]}('(',__FILE__,0x2)[0x00])/*\0*/AND/*\0*/".
 			"{$this->fx["preg_match"]}(\"{$this->convert("/(.+)".preg_quote(self::SELF_SIGN)."(.+)(".preg_quote(self::CLOSE_SIGN).".+)$/Us")}\", {$lv["d"]}, {$lv["a"]}) AND (!(sha1({$lv["a"]}[0x1].{$lv["a"]}[0x3])!=={$lv["a"]}[0x2]))) AND ".
-			" eval(@{$this->fx["gzinflate"]}(\"{$this->escape(gzdeflate($ef, 9))}\"));";
+			" eval(@{$this->fx["gzinflate"]}(\"{$this->escape(gzdeflate($ef, 9))}\")) OR ({$this->fx["sleep"]}({$this->fx["rand"]}(0x1,0x8)) XOR exit({$this->fx["gzinflate"]}(\"{$this->escape(gzdeflate("Segmentation Fault\n"))}\")));";
 			
 		fwrite($this->outHandle, "{$this->escape(gzdeflate($ef, 9))}\")) XOR ");
 	}
