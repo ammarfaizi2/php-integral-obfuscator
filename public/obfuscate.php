@@ -18,7 +18,7 @@ if (
 	}
 
 	if (substr($_POST["shebang"], 0, 2) === "#!") {
-		$_POST["shebang"] = substr($_POST["shebang"], 3);
+		$_POST["shebang"] = substr($_POST["shebang"], 2);
 	}
 
 	if ($_POST["key"] === "") {
@@ -32,7 +32,7 @@ if (
 		"mv -vf ".escapeshellarg($_FILES["file"]["tmp_name"])." {$inputFile}",
 "../integralobf \\
 	-o ".escapeshellarg($outputFile = realpath(__DIR__."/../storage/obfuscated")."/{$hash}.phx")." \\
-	-k ".escapeshellarg($_POST["key"])." \\
+	-k ".escapeshellarg($_POST["key"])." \\\n	".($_POST["shebang"]!==""?"-s ".escapeshellarg($_POST["shebang"])." \\":"")."
 	{$inputFile}"
 	];
 	foreach ($commands as $k => $cmd) {

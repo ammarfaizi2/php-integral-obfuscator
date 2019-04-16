@@ -62,7 +62,6 @@ if (!is_string($inputFile)) {
 
 define("TMP_DIR", "/tmp");
 try {
-
 	if ($key === "") {
 		printf("Error: Key cannot be empty!\n");
 		exit(1);
@@ -101,7 +100,7 @@ exit(0);
 
 function parseOpt1(): void
 {
-	global $k, $v, $cq, $inv, $skip, $tmpDir, $inputFile, $outputFile;
+	global $k, $v, $cq, $inv, $skip, $sheBang, $tmpDir, $inputFile, $outputFile;
 
 	if ($v === "-o") {
 		if ($cq) {
@@ -158,7 +157,7 @@ function parseOpt1(): void
 
 function parseOpt2(): void
 {
-	global $k, $v, $cq, $inv, $skip, $tmpDir, $inputFile, $outputFile;
+	global $k, $v, $cq, $inv, $skip, $sheBang, $tmpDir, $inputFile, $outputFile;
 
 	if ($v === "--output") {
 		if (!isset($_SERVER["argv"][$k + 1])) {
