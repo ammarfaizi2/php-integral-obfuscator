@@ -81,6 +81,16 @@ final class IntegralObfuscator
 	private static $rdl;
 
 	/**
+	 * @var array
+	 */
+	private $internalDecompressor = [];
+
+	/**
+	 * @var int
+	 */
+	private $maxDecompressor;
+
+	/**
 	 * @var string
 	 */
 	private static $intStop = "/*\ec\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0*/";
@@ -209,6 +219,20 @@ if (function_exists(\"pcntl_signal\")) {
 		foreach ($this->fx as $key => $val) {
 			fwrite($this->outHandle, "{$val}=\"{$this->convert($key)}\"/*\0*/AND/*\0*/");
 		}
+		$decompressor = "";
+		foreach ($this->internalDecompressor as $val) {
+			$decompressor .= "\${\"{$this->escape($val)}\"}=";
+		}
+		fwrite($this->outHandle, "{$decompressor}\"{$this->convert("gzinflate")}\"/*\0*/AND/*\0*/");
+		$this->maxDecompressor = count($this->internalDecompressor) - 1;
+	}
+
+	/**
+	 * @return string
+	 */
+	private function inDec(): string
+	{
+		return "\$GLOBALS[\"{$this->escape($this->internalDecompressor[rand(0, $this->maxDecompressor)])}\"]";
 	}
 
 	/**
@@ -240,7 +264,7 @@ if (function_exists(\"pcntl_signal\")) {
 			"{$this->escape($this->encrypt(gzdeflate(self::$intStop."?>".$this->ast, 9), $this->md5Key))}".
 			"\", {$this->fx["gzinflate"]}(\"{$this->escape(gzdeflate($this->md5Key))}\"))));";
 
-		for ($i=0; $i < 4; $i++) { 
+		for ($i=0; $i < 4; $i++) {
 			$app = 
 				"eval({$this->fx["gzinflate"]}((\"{$this->escape($this->decryptorName)}\")(\"".
 				"{$this->escape($this->encrypt(gzdeflate(self::$intStop.$app.self::$intStop, 9), $this->md5Key))}".
@@ -301,6 +325,31 @@ if (function_exists(\"pcntl_signal\")) {
 		$this->ast = shell_exec(PHP_BINARY." -w ".escapeshellarg(TMP_DIR."/integralobf_{$this->hash}.tmp"));
 		unlink(TMP_DIR."/integralobf_{$this->hash}.tmp");
 		unset($parser, $traverser, $prettyPrinter);
+		$fxAst = "";
+
+		$this->internalDecompressor = [
+			$this->gen(5, 2),
+			$this->gen(5, 2),
+			$this->gen(5, 2),
+			$this->gen(5, 2),
+			$this->gen(5, 2)
+		];
+
+		foreach (token_get_all($this->ast, TOKEN_PARSE) as $token) {
+			if (is_string($token)) {
+				$fxAst .= trim($token);
+			} else if (is_array($token)) {
+				if ($token[0] === T_CONSTANT_ENCAPSED_STRING) {
+					ob_start();
+					eval("print {$token[1]};");
+					$token[1] = gzdeflate(ob_get_clean(), 9);
+					$token[1] = "{$this->inDec()}(\"{$this->escape(($token[1]))}\")";
+				}
+				$fxAst .= $token[1];
+			}
+		}
+		$this->ast = $fxAst;
+		unset($fxAst);
 	}
 
 	/**

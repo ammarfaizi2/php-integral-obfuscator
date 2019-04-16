@@ -53,7 +53,7 @@ class IntegralVisitor extends NodeVisitorAbstract
         	$node->name = $this->varHash[$node->name];
             return;
         } else if ($node instanceof Class_) {
-        	return NodeTraverser::STOP_TRAVERSAL;
+        	return NodeTraverser::DONT_TRAVERSE_CHILDREN;
         }
     }
 }
