@@ -22,7 +22,7 @@ if (
 	$commands = [
 		"mv -vf ".escapeshellarg($_FILES["file"]["tmp_name"])." {$inputFile}",
 "../integralobf \\
-	-o ".escapeshellarg($outputFile = realpath(__DIR__."/../storage/raw")."/{$hash}.phx")." \\
+	-o ".escapeshellarg($outputFile = realpath(__DIR__."/../storage/obufscated")."/{$hash}.phx")." \\
 	-k ".escapeshellarg($_POST["key"])." \\
 	{$inputFile}"
 	];
