@@ -6,7 +6,7 @@ PHP Integral Obfuscator is a tool to obfuscates PHP code. It compiles a PHP code
 1. Make your PHP code not human readable. It is good for protecting your private code against people and script kiddies.
 
 ### Disadvantages of Using Obfuscator
-1. Obfuscator may slow down your application in the start process (it does not affect your application runtime performance). But, if you are using it on a web-based application, the start process is done for every request. The obfuscation is the best for CLI based application, not web-based application.
+1. Obfuscator may slow down your application in the start process (it does not affect your application runtime performance). But, if you are using it on a web-based application, the start process is done for every request. So, code obfuscation is only good for a CLI based application, not a web-based application.
 2. The obfuscated file size is larger than the non-obfuscated file.
 3. An obfuscated application may not be started properly due to inaccurate analyses, bugs in internal obfuscator, or any other possibilities.
 
