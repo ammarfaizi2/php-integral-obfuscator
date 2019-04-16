@@ -28,7 +28,7 @@
 		<div class="cg">
 			<div class="cgf">
 				<h2>Upload your PHP code!</h2>
-				<form action="obfuscate.php" enctype="multipart/form-data">
+				<form method="POST" action="obfuscate.php" enctype="multipart/form-data">
 					<table>
 						<tbody>
 							<tr><td>Upload File</td><td>:</td><td><input type="file" name="file" required/></td></tr>
