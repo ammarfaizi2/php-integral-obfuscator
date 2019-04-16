@@ -13,7 +13,7 @@ $inputFile = null;
 $sheBang = null;
 $key = "abc123";
 
-$hasInputFile = $cq = $skip = false;
+$inv = $hasInputFile = $cq = $skip = false;
 foreach ($_SERVER["argv"] as $k => $v) {
 
 	if ($skip) {
@@ -42,6 +42,11 @@ foreach ($_SERVER["argv"] as $k => $v) {
 		}
 		$inputFile = $v;
 		$hasInputFile = true;
+	}
+
+
+	if ($inv) {
+		goto invalid_parameter;
 	}
 }
 
@@ -90,7 +95,7 @@ exit(0);
 
 function parseOpt1(): void
 {
-	global $k, $v, $cq, $skip, $tmpDir, $inputFile, $outputFile;
+	global $k, $v, $cq, $inv, $skip, $tmpDir, $inputFile, $outputFile;
 
 	if ($v === "-o") {
 		if ($cq) {
@@ -134,8 +139,51 @@ function parseOpt1(): void
 			$key = $_SERVER["argv"][$k + 1];
 			$skip = true;
 			return;
-		}		
+		}
 	}
+
+	$v = substr($v, 0, 2);
+	$inv = true;
+}
+
+function parseOpt2(): void
+{
+	global $k, $v, $cq, $inv, $skip, $tmpDir, $inputFile, $outputFile;
+
+	if ($v === "--output") {
+		if (!isset($_SERVER["argv"][$k + 1])) {
+			printf("Error: -o option required a value\n");
+			exit(1);
+		} else {
+			$outputFile = $_SERVER["argv"][$k + 1];
+			$skip = true;
+			return;
+		}
+	}
+
+	if ($v === "--shebang") {
+		if (!isset($_SERVER["argv"][$k + 1])) {
+			printf("Error: -s option required a value\n");
+			exit(1);
+		} else {
+			$sheBang = $_SERVER["argv"][$k + 1];
+			$skip = true;
+			return;
+		}
+	}
+
+	if ($v === "--key") {
+		if (!isset($_SERVER["argv"][$k + 1])) {
+			printf("Error: -k option required a value\n");
+			exit(1);
+		} else {
+			$key = $_SERVER["argv"][$k + 1];
+			$skip = true;
+			return;
+		}
+	}
+
+	$inv = true;
 }
 
 
