@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<?php ob_start(); ?><!DOCTYPE html>
 <html>
 <head>
 	<title>PHP Integral Obfuscator</title>
@@ -65,4 +65,4 @@
 		</div>
 	</center>
 </body>
-</html>
+</html><?php print str_replace(["\t", "\n"], "", ob_get_clean()); ?>
