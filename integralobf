@@ -100,7 +100,7 @@ exit(0);
 
 function parseOpt1(): void
 {
-	global $k, $v, $cq, $inv, $skip, $sheBang, $tmpDir, $inputFile, $outputFile;
+	global $k, $v, $key, $cq, $inv, $skip, $sheBang, $tmpDir, $inputFile, $outputFile;
 
 	if ($v === "-o") {
 		if ($cq) {
@@ -157,7 +157,7 @@ function parseOpt1(): void
 
 function parseOpt2(): void
 {
-	global $k, $v, $cq, $inv, $skip, $sheBang, $tmpDir, $inputFile, $outputFile;
+	global $k, $v, $key, $cq, $inv, $skip, $sheBang, $tmpDir, $inputFile, $outputFile;
 
 	if ($v === "--output") {
 		if (!isset($_SERVER["argv"][$k + 1])) {
