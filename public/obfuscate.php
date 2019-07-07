@@ -32,8 +32,7 @@ if (
 		"mv -vf ".escapeshellarg($_FILES["file"]["tmp_name"])." {$inputFile}",
 "/usr/bin/php ../integralobf \\
 	-o ".escapeshellarg($outputFile = realpath(__DIR__."/../storage/obfuscated")."/{$hash}.phx")." \\
-	-k ".escapeshellarg($_POST["key"])." \\\n	".($_POST["shebang"]!==""?"-s ".escapeshellarg($_POST["shebang"])." \\":"")."
-	{$inputFile}"
+	-k ".escapeshellarg($_POST["key"])." \\\n	".($_POST["shebang"]!==""?"-s ".escapeshellarg($_POST["shebang"])." \\\n":"")." {$inputFile}"
 	];
 	foreach ($commands as $k => $cmd) {
 		printf("- %s\n", $cmd);
