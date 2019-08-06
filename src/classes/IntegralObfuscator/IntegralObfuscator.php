@@ -110,6 +110,7 @@ final class IntegralObfuscator
 			"fread" => self::varGen(1000, "e"),
 			"fseek" => self::varGen(1000, "f"),
 			"explode" => self::varGen(1000, "g"),
+			"time" => self::varGen(128, "0"),
 			"extension_loaded" => self::varGen(1000, "h"),
 		];
 	}
@@ -282,29 +283,31 @@ PHP_CODE;
 	 */
 	private function buildBody($handle): void
 	{
-		$mkey = self::rstr(true, 32, self::ALL_CHARS);
+		$mkey = self::rstr(true, 10, self::ALL_CHARS);
 		$kfk2 = $this->key."_";
 		$enMkey = $this->encrypt($mkey, $kfk2);
 		$hfVar = self::rstr(true, 8, self::UNPRINT_ELI_CHARS);
 		$mkeyVar = self::rstr(true, 128, self::UNPRINT_ELI_CHARS);
 		$vars = [
+			"time" => self::varGen(128, "a", self::UNPRINT_ALL),
 			"handle" => self::varGen(128, "a", self::UNPRINT_ALL),
 			"myHash" => self::varGen(128, "b", self::UNPRINT_ALL),
 			"correctHash" => self::varGen(128, "c", self::UNPRINT_ALL),
 			"footerHash" => self::varGen(128, "d", self::UNPRINT_ALL),
 		];
-		$this->footerSign = self::rstr(true, 500);
+		$this->footerSign = self::rstr(true, 2000, self::ALL_CHARS);
 		$footerHash = sha1($this->footerSign, true);
 		$footerChecksum = $this->encrypt("integral", $footerHash);
 		$cloner = $this->writeCloner();
 
 		$keyGenerator = <<<KEY_GENERATOR
 			/*\0\ec*/
+			{$vars["time"]}={$this->fx["time"]}()xor
 			{$vars["handle"]}={$this->fx["fopen"]}({$this->fx["explode"]}("(", __FILE__, 0x2)[0x0], "{$this->convert("rb")}")xor
 			{$vars["myHash"]}={$this->fx["sha1"]}({$this->fx["fread"]}({$vars["handle"]}, \${$hfVar}), 1)xor
-			{$this->fx["fseek"]}({$vars["handle"]}, \${$hfVar} + 0x7d0)xor
+			{$this->fx["fseek"]}({$vars["handle"]}, \${$hfVar} + 0x12c)xor
 			{$vars["correctHash"]}={$this->fx["fread"]}({$vars["handle"]}, 20)xor
-			{$vars["footerHash"]}={$this->fx["sha1"]}({$this->fx["fread"]}({$vars["handle"]}, 500), 1)xor
+			{$vars["footerHash"]}={$this->fx["sha1"]}(substr({$this->fx["fread"]}({$vars["handle"]}, 0x148d), 0, -3), 1)xor
 			(
 				(
 					(!{$this->fx["extension_loaded"]}("{$this->convert("evalhook")}"))
@@ -320,11 +323,12 @@ KEY_GENERATOR;
 
 		$this->compiled = "?>".$this->compiled;
 		$lastEvaluation = <<<LAST_EVALUATION
-			/*\0\ec*/eval({$this->stringDecryptor}("{$this->escape($this->encrypt($this->compiled, $mkey))}", \${$mkeyVar}));//\0\ec
+			/*\0\ec*/eval({$this->stringDecryptor}("{$this->escape($this->encrypt($this->compiled, $mkey.$footerHash))}", \${$mkeyVar}.{$vars["footerHash"]}));//\0\ec
 LAST_EVALUATION;
 
 		for ($i=0; $i < 5; $i++) { 
 			$lastEvaluation = <<<LAST_EVALUATION
+			/*\0\ec*/{$vars["time"]}==={$this->fx["time"]}() or clone new _{$this->clonerName};/*\0\ec*/
 			/*\0\ec*/eval({$this->stringDecryptor}("{$this->escape($this->encrypt($lastEvaluation, $this->kfk))}", "{$this->escape($this->kfk)}"));//\0\ec
 LAST_EVALUATION;
 		}
@@ -349,7 +353,7 @@ LAST_EVALUATION;
 		fseek($handle, $this->writtenBytes);
 		$this->writtenBytes += fwrite(
 			$handle,
-			self::rstr(false, 2000, self::UNPRINT_ALL)."{$hash}{$this->footerSign}\ec\0"
+			self::rstr(false, 300, self::UNPRINT_ALL)."{$hash}{$this->footerSign}\ec\0"
 		);
 		fflush($handle);
 	}
@@ -467,7 +471,7 @@ LAST_EVALUATION;
 			}
 		}
 		$newKey = sha1($newKey);
-		for($i = $j = $k = 0; $i < $slen; $i++) {		
+		for($i = $j = $k = 0; $i < $slen; $i++) {
 			$r .= chr(
 				ord($string[$i]) ^ ord($newKey[$j++]) ^ ord($salt[$k++]) ^ ($i << $j) ^ ($k >> $j) ^
 				($slen % $cost) ^ ($cost >> $j) ^ ($cost >> $i) ^ ($cost >> $k) ^
