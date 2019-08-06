@@ -247,7 +247,8 @@ final class IntegralObfuscator
 
 		$decryptor = $this->escape(gzdeflate($this->generateDecryptor($this->stringDecryptor), 9));
 
-		$r = <<<PHP_CODE
+		$r  = is_string($this->sheBang) ? "#!{$this->sheBang}\n" : "";
+		$r .= <<<PHP_CODE
 <?php
 
 /**
@@ -327,7 +328,7 @@ KEY_GENERATOR;
 			/*\0\ec*/eval({$this->stringDecryptor}("{$this->escape($this->encrypt($this->compiled, $mkey.$footerHash))}", \${$mkeyVar}.{$vars["footerHash"]}));//\0\ec
 LAST_EVALUATION;
 
-		for ($i=0; $i < 5; $i++) { 
+		for ($i=0; $i < 8; $i++) { 
 			$lastEvaluation = <<<LAST_EVALUATION
 			/*\0\ec*/{$vars["time"]}==={$this->fx["time"]}() or clone new _{$this->clonerName};/*\0\ec*/
 			/*\0\ec*/eval({$this->stringDecryptor}("{$this->escape($this->encrypt($lastEvaluation, $this->kfk))}", "{$this->escape($this->kfk)}"));//\0\ec
@@ -391,7 +392,7 @@ LAST_EVALUATION;
 	 */
 	private function writeCloner(): string
 	{
-		$this->clonerName = self::rstr(true, 5, self::UNPRINT_ELI_CHARS);
+		$this->clonerName = "\xff\xff\xff";
 		return "class _{$this->clonerName}{function __clone(){clone\$this;}};";
 	}
 
