@@ -50,7 +50,12 @@ class IntegralVisitor extends NodeVisitorAbstract
         	($node instanceof Variable) &&
         	($node->name !== "_POST") &&
         	($node->name !== "_GET") &&
-        	($node->name !== "_SERVER")
+            ($node->name !== "_GET") &&
+            ($node->name !== "_ENV") &&
+        	($node->name !== "_SERVER") &&
+            ($node->name !== "GLOBALS") &&
+            ($node->name !== "argv") &&
+            ($node->name !== "argc")
         ) {
         	if (!isset($this->varHash[$node->name])) {
         		do {

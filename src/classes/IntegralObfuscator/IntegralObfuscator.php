@@ -315,7 +315,7 @@ PHP_CODE;
 					({$vars["correctHash"]} === {$vars["myHash"]})
 						/*\0*/&&/*\0*/
 					{$this->stringDecryptor}("{$this->escape($footerChecksum)}", "{$vars["footerHash"]}") === "{$this->convert("integral")}"
-				) 
+				)
 				and \${$mkeyVar} = {$this->stringDecryptor}("{$this->escape($enMkey)}", "{$this->escape($kfk2)}")
 				or clone new _{$this->clonerName}
 			);{$cloner}//\0\ec
@@ -323,6 +323,7 @@ KEY_GENERATOR;
 
 		$this->compiled = "?>".$this->compiled;
 		$lastEvaluation = <<<LAST_EVALUATION
+			/*\0\ec*/{$vars["time"]}==={$this->fx["time"]}() or clone new _{$this->clonerName};/*\0\ec*/
 			/*\0\ec*/eval({$this->stringDecryptor}("{$this->escape($this->encrypt($this->compiled, $mkey.$footerHash))}", \${$mkeyVar}.{$vars["footerHash"]}));//\0\ec
 LAST_EVALUATION;
 
